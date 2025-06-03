@@ -1,14 +1,27 @@
-/** @type {import('tailwindcss').Config} */
+/** @type {import('tailwindcss').Config} */ 
 module.exports = {
   content: ['./src/**/*.{html,ts}'],
   theme: {
     extend: {
       colors: {
-        primary: '#4F46E5',
-        secondary: '#F59E0B',
+        background: '#F9FAFB',
+        surface: '#FFFFFF',
+        accent: '#2563EB',         
+        'accent-light': '#60A5FA',
+        'accent-dark': '#1E3A8A',
+        'neutral-50': '#F9FAFB',
+        'neutral-100': '#F3F4F6',
+        'neutral-200': '#E5E7EB',
+        'neutral-300': '#D1D5DB',
+        'neutral-400': '#9CA3AF',
+        'neutral-500': '#6B7280',
+        'neutral-600': '#4B5563',
+        'neutral-700': '#374151',
+        'neutral-800': '#1F2937',
+        'neutral-900': '#111827',
       },
       fontFamily: {
-        inter: ['"Inter", sans-serif'],
+        inter: ['"Inter"', 'sans-serif'],
       },
       gridTemplateColumns: {
         sidebar: 'min-content 1fr',
@@ -30,4 +43,3 @@ module.exports = {
   },
   plugins: [],
 }
-
