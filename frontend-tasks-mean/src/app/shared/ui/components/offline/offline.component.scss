@@ -1,0 +1,12 @@
+:host {
+  @apply block h-full w-full;
+
+  .offline-banner {
+    background-color: #ffdddd;
+    color: #b00020;
+    padding: 12px;
+    text-align: center;
+    font-weight: bold;
+    border-bottom: 2px solid #b00020;
+  }
+}
