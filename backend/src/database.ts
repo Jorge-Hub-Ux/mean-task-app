@@ -1,10 +1,12 @@
 import * as mongodb from "mongodb";
 import { Task } from "./task";
 
+// Global object to hold references to MongoDB collections
 export const collections: {
     tasks?: mongodb.Collection<Task>;
 } = {};
 
+// Connects to MongoDB and initializes the 'tasks' collection with schema validation
 export async function connectToDatabase(uri: string) {
     const client = new mongodb.MongoClient(uri);
     await client.connect();
@@ -16,6 +18,7 @@ export async function connectToDatabase(uri: string) {
     collections.tasks = tasksCollection;
 }
 
+// Applies JSON schema validation rules to the tasks collection to ensure consistent structure
 async function applySchemaValidation(db: mongodb.Db) {
     const jsonSchema = {
         $jsonSchema: {
@@ -75,3 +78,31 @@ async function applySchemaValidation(db: mongodb.Db) {
         }
     });
 }
+
+
+// const { MongoClient, ServerApiVersion } = require('mongodb');
+// const uri = "mongodb+srv://sirjorgeramirez:J0rg3Mongo$@mean-task-cluster.3y4yku2.mongodb.net/?retryWrites=true&w=majority&appName=mean-task-cluster";
+
+// // Create a MongoClient with a MongoClientOptions object to set the Stable API version
+// const client = new MongoClient(uri, {
+//   serverApi: {
+//     version: ServerApiVersion.v1,
+//     strict: true,
+//     deprecationErrors: true,
+//   }
+// });
+
+// async function run() {
+//   try {
+//     // Connect the client to the server	(optional starting in v4.7)
+//     await client.connect();
+//     // Send a ping to confirm a successful connection
+//     await client.db("admin").command({ ping: 1 });
+//     console.log("Pinged your deployment. You successfully connected to MongoDB!");
+//   } finally {
+//     // Ensures that the client will close when you finish/error
+//     await client.close();
+//   }
+// }
+// run().catch(console.dir);
+
