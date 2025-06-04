@@ -3,6 +3,8 @@ import express from "express";
 import cors from "cors";
 import { connectToDatabase } from "./database";
 import { taskRouter } from "./task.routes";
+import { requestLogger } from "./logger.middleware";
+import { errorHandler } from "./error.middleware";
 
 // Initialize dotenv
 dotenv.config();
@@ -21,9 +23,11 @@ if (!ATLAS_URI) {
 connectToDatabase(ATLAS_URI)
   .then(() => {
     const app = express();
+    
     app.use(cors());
-    // Set up task-related routes at /tasks path
+    app.use(requestLogger);
     app.use("/tasks", taskRouter);
+    app.use(errorHandler);
 
     // start the Express server
     app.listen(5200, () => {

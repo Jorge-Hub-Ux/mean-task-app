@@ -3,6 +3,7 @@ node_modules/
 
 # Environment variables
 .env
+config.env
 
 # Logs
 npm-debug.log*
@@ -12,6 +13,7 @@ yarn-error.log*
 # Build output
 dist/
 build/
+coverage/
 
 # TypeScript
 *.tsbuildinfo
@@ -21,7 +23,9 @@ build/
 
 # OS/system
 .DS_Store
+Thumbs.db
 
-# ts-node cache
+# ts-node / compiled output
 *.js
 *.js.map
+
