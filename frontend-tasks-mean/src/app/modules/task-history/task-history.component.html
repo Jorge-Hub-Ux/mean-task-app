@@ -1,0 +1,18 @@
+<h2 mat-dialog-title>Historial de cambios</h2>
+<mat-dialog-content *ngIf="task?.history?.length > 0; else noHistory">
+  <div *ngFor="let entry of task.history" class="mb-4">
+    <p class="font-bold text-sm">{{ entry.changedAt | date: 'short' }}</p>
+    <ul class="pl-4 list-disc">
+      <li *ngFor="let change of entry.changes">{{ change }}</li>
+    </ul>
+    <mat-divider></mat-divider>
+  </div>
+</mat-dialog-content>
+
+<ng-template #noHistory>
+  <p>Esta tarea no tiene historial registrado.</p>
+</ng-template>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cerrar</button>
+</mat-dialog-actions>

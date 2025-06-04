@@ -43,6 +43,7 @@ testem.log
 !.vscode/launch.json
 !.vscode/extensions.json
 .history/
+.vscode/
 
 # System files
 .DS_Store
