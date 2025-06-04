@@ -6,8 +6,25 @@ import { Task } from "./task";
 export const taskRouter = express.Router();
 taskRouter.use(express.json());
 
+const errorResponse = (
+  res: express.Response,
+  status: number,
+  message: string
+) => {
+  const titles: Record<number, string> = {
+    400: "Bad Request",
+    404: "Not Found",
+    500: "Server Error",
+  };
+  res.status(status).json({
+    errorTitle: titles[status] || "Error",
+    message,
+    statusCode: status,
+  });
+};
+
 // SECTION - POST
-taskRouter.post("/", async (req, res): Promise<void> => {
+taskRouter.post("/", async (req, res) => {
   try {
     const {
       title,
@@ -18,31 +35,16 @@ taskRouter.post("/", async (req, res): Promise<void> => {
       description,
     } = req.body;
 
-    if (!title || title.length < 3) {
-      res
-        .status(400)
-        .send("Title is required and must be at least 3 characters.");
-      return;
-    }
-
-    if (!["Pending", "In Progress", "Completed"].includes(status)) {
-      res
-        .status(400)
-        .send("Status must be one of: Pending, In Progress, Completed.");
-      return;
-    }
-
+    if (!title || title.length < 3)
+      return errorResponse(res, 400, "Title must be at least 3 characters.");
+    if (!["Pending", "In Progress", "Completed"].includes(status))
+      return errorResponse(res, 400, "Invalid status.");
     const parsedDueDate = new Date(dueDate);
-    if (isNaN(parsedDueDate.getTime()) || parsedDueDate <= new Date()) {
-      res.status(400).send("Due date must be a valid future date.");
-      return;
-    }
-
+    if (isNaN(parsedDueDate.getTime()) || parsedDueDate <= new Date())
+      return errorResponse(res, 400, "Invalid future due date.");
     const uniqueTags = [...new Set(tags as string[])];
-    if (tags.length !== uniqueTags.length) {
-      res.status(400).send("Tags must be unique.");
-      return;
-    }
+    if (tags.length !== uniqueTags.length)
+      return errorResponse(res, 400, "Tags must be unique.");
 
     const task: Task = {
       title,
@@ -55,88 +57,69 @@ taskRouter.post("/", async (req, res): Promise<void> => {
       updatedAt: new Date(),
     };
 
-    const result = await collections?.tasks?.insertOne(task);
-
+    const result = await collections.tasks?.insertOne(task);
     if (result?.acknowledged) {
-      res.status(201).send(`Created a new task: ID ${result.insertedId}.`);
-      return;
+      res.status(201).json({
+        message: "Task created successfully",
+        data: { id: result.insertedId },
+      });
     } else {
-      res.status(500).send("Failed to create a new task.");
-      return;
+      errorResponse(res, 500, "Failed to create a new task.");
     }
   } catch (error) {
-    console.error(error);
-    res
-      .status(400)
-      .send(error instanceof Error ? error.message : "Unknown error");
-    return;
+    errorResponse(
+      res,
+      500,
+      error instanceof Error ? error.message : "Unknown error."
+    );
   }
 });
 
-// SECTION - GET /tasks (list with filters)
-taskRouter.get("/", async (req, res): Promise<void> => {
+// SECTION - GET /tasks
+taskRouter.get("/", async (req, res) => {
   try {
     const { status, priority, tags, startDate, endDate } = req.query;
     const filter: any = {};
 
-    if (status && typeof status === "string") {
-      filter.status = status;
-    }
-
-    if (priority && typeof priority === "string") {
-      filter.priority = priority;
-    }
-
-    if (tags && typeof tags === "string") {
-      const tagArray = tags.split(",").map((tag) => tag.trim());
-      filter.tags = { $in: tagArray };
-    }
-
+    if (status) filter.status = status;
+    if (priority) filter.priority = priority;
+    if (tags && typeof tags === "string")
+      filter.tags = { $in: tags.split(",").map((t) => t.trim()) };
     if (startDate || endDate) {
       filter.dueDate = {};
-      if (startDate && typeof startDate === "string") {
-        filter.dueDate.$gte = new Date(startDate);
-      }
-      if (endDate && typeof endDate === "string") {
-        filter.dueDate.$lte = new Date(endDate);
-      }
+      if (startDate) filter.dueDate.$gte = new Date(startDate as string);
+      if (endDate) filter.dueDate.$lte = new Date(endDate as string);
     }
 
     const tasks = await collections.tasks
       ?.find(filter)
       .sort({ dueDate: 1 })
       .toArray();
-
-    res.status(200).json(tasks);
-    return;
+    res
+      .status(200)
+      .json({ message: "Tasks fetched successfully", data: tasks });
   } catch (error) {
-    res.status(500).json({ error: (error as Error).message });
-    return;
+    errorResponse(res, 500, "Error retrieving tasks.");
   }
 });
 
 // SECTION - GET /tasks/:id
-taskRouter.get("/:id", async (req, res): Promise<void> => {
+taskRouter.get("/:id", async (req, res) => {
   try {
-    const id = req?.params?.id;
-    const query = { _id: new ObjectId(id) };
-    const task = await collections?.tasks?.findOne(query);
-
+    const id = req.params.id;
+    const task = await collections.tasks?.findOne({ _id: new ObjectId(id) });
     if (task) {
-      res.status(200).send(task);
-      return;
+      res.status(200).json({ message: "Task fetched", data: task });
     } else {
-      res.status(404).send(`Failed to find a task: ID ${id}`);
-      return;
+      errorResponse(res, 404, `Task not found with ID: ${id}`);
     }
-  } catch (error) {
-    res.status(404).send(`Failed to find a task: ID ${req?.params?.id}`);
-    return;
+  } catch {
+    errorResponse(res, 400, "Invalid task ID format.");
   }
 });
 
 // SECTION - PUT /tasks/:id
-taskRouter.put("/:id", async (req, res): Promise<void> => {
+taskRouter.put("/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const updates = req.body;
@@ -144,80 +127,60 @@ taskRouter.put("/:id", async (req, res): Promise<void> => {
     const existing = await collections.tasks?.findOne({
       _id: new ObjectId(id),
     });
-
-    if (!existing) {
-      res.status(404).json({ error: "Task not found." });
-      return;
-    }
+    if (!existing) return errorResponse(res, 404, "Task not found.");
 
     if (
       updates.status &&
       existing.status === "Pending" &&
       updates.status === "Completed"
     ) {
-      res.status(400).json({
-        error: "Cannot change status directly from Pending to Completed.",
-      });
-      return;
+      return errorResponse(
+        res,
+        400,
+        "Cannot change status directly from Pending to Completed."
+      );
     }
 
-    if (updates.title && updates.title.length < 3) {
-      res.status(400).json({ error: "Title must be at least 3 characters." });
-      return;
-    }
-
-    if (updates.dueDate && new Date(updates.dueDate) <= new Date()) {
-      res.status(400).json({ error: "Due date must be in the future." });
-      return;
-    }
-
+    if (updates.title && updates.title.length < 3)
+      return errorResponse(res, 400, "Title too short.");
+    if (updates.dueDate && new Date(updates.dueDate) <= new Date())
+      return errorResponse(res, 400, "Due date must be in the future.");
     if (updates.tags) {
       const uniqueTags = [...new Set(updates.tags)];
-      if (updates.tags.length !== uniqueTags.length) {
-        res.status(400).json({ error: "Tags must be unique." });
-        return;
-      }
+      if (updates.tags.length !== uniqueTags.length)
+        return errorResponse(res, 400, "Tags must be unique.");
       updates.tags = uniqueTags;
     }
 
     updates.updatedAt = new Date();
 
-    const result = await collections?.tasks?.findOneAndUpdate(
+    const result = await collections.tasks?.findOneAndUpdate(
       { _id: new ObjectId(id) },
       { $set: updates },
       { returnDocument: "after" }
     );
 
     if (result) {
-      res.status(200).json(result);
-      return;
+      res.status(200).json({ message: "Task updated", data: result });
     } else {
-      res.status(404).json({ error: `Task not updated. ID: ${id}` });
-      return;
+      errorResponse(res, 500, "Update failed.");
     }
-  } catch (error) {
-    res.status(400).json({ error: "Invalid update or ID." });
-    return;
+  } catch {
+    errorResponse(res, 400, "Invalid update request.");
   }
 });
 
 // SECTION - DELETE /tasks/:id
-taskRouter.delete("/:id", async (req, res): Promise<void> => {
+taskRouter.delete("/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const result = await collections.tasks?.deleteOne({
       _id: new ObjectId(id),
     });
-
-    if (!result?.deletedCount) {
-      res.status(404).json({ error: "Task not found." });
-      return;
-    }
-
-    res.status(204).send();
-    return;
-  } catch (error) {
-    res.status(400).json({ error: "Invalid ID format." });
-    return;
+    if (!result?.deletedCount)
+      return errorResponse(res, 404, "Task not found.");
+    res.status(200).json({ message: "Task deleted", data: { id } });
+  } catch {
+    errorResponse(res, 400, "Invalid ID format.");
   }
 });

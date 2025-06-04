@@ -4,8 +4,6 @@ import { catchError, throwError } from 'rxjs';
 export type ErrorType = {
   errorTitle: string;
   message: string;
-  errors?: Record<string, string>;
-  controls?: Record<string, string> | null;
   statusCode?: number;
 };
 

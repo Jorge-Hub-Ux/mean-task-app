@@ -1,9 +1,8 @@
-const API_CONFIG = {
+export const API_CONFIG = {
   AUTH: {
 
   },
   TASKS: {
-    GET: '/',
-    GET_BY_ID: '/',
+    TASK: 'tasks',
   },
 }

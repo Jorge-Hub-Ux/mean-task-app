@@ -14,7 +14,6 @@ import { MAT_DATE_CUSTOM_FORMATS } from './shared/utils/config/date-adapters';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(
       routes,
       withComponentInputBinding(),
