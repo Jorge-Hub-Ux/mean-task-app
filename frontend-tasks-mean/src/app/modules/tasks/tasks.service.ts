@@ -5,6 +5,11 @@ import { Task } from '../../shared/models/task.model';
 import { environment } from '../../../environment/environment.local';
 import { API_CONFIG } from '../../core/data/api.data';
 
+interface TaskResponse<T> {
+  data: T;
+  message: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -12,12 +17,12 @@ export class TasksService {
 
   private http = inject(HttpClient);
 
-  getTasks(): Observable<Task[]> {
-    return this.http.get<Task[]>(`${environment.apiUrl}/${API_CONFIG.TASKS.TASK}`);
+  getTasks(): Observable<TaskResponse<Task[]>> {
+    return this.http.get<TaskResponse<Task[]>>(`${environment.apiUrl}/${API_CONFIG.TASKS.TASK}`);
   }
 
-  getTaskById(id: string): Observable<Task> {
-    return this.http.get<Task>(`${environment.apiUrl}/${API_CONFIG.TASKS.TASK}/${id}`);
+  getTaskById(id: string): Observable<TaskResponse<Task>> {
+    return this.http.get<TaskResponse<Task>>(`${environment.apiUrl}/${API_CONFIG.TASKS.TASK}/${id}`);
   }
 
   createTask(task: Task): Observable<any> {

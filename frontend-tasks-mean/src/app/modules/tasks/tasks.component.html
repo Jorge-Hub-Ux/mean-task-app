@@ -1,6 +1,89 @@
-<p>tasks works</p>
+<!-- <p>tasks works</p>
 <button (click)="getAllTasks()">Get Tasks</button>
 <button (click)="getTaskById()">Get Task by id</button>
 <button (click)="createTask()">Post Task</button>
 <button (click)="updateTask()">Put Task</button>
-<button (click)="deleteTask()">Delete Task</button>
+<button (click)="deleteTask()">Delete Task</button> -->
+
+<div class="p-4 space-y-4">
+  <!-- Search & Filters -->
+  <div class="flex flex-wrap items-center gap-4">
+    <mat-form-field appearance="outline" class="w-full sm:w-auto">
+      <mat-label>Buscar por título</mat-label>
+      <input matInput (input)="applyFilter($event)" placeholder="Buscar...">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full sm:w-auto">
+      <mat-label>Filtrar por estado</mat-label>
+      <mat-select [(value)]="filters.status" (selectionChange)="loadTasks()">
+        <mat-option value="">Todos</mat-option>
+        <mat-option *ngFor="let s of statuses" [value]="s">{{s}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full sm:w-auto">
+      <mat-label>Prioridad</mat-label>
+      <mat-select [(value)]="filters.priority" (selectionChange)="loadTasks()">
+        <mat-option value="">Todas</mat-option>
+        <mat-option *ngFor="let p of priorities" [value]="p">{{p}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <!-- Tabla de tareas -->
+  <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z2 w-full bg-white rounded shadow">
+    <ng-container matColumnDef="title">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Título</th>
+      <td mat-cell *matCellDef="let task">{{task.title}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Estado</th>
+      <td mat-cell *matCellDef="let task">{{task.status}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="priority">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Prioridad</th>
+      <td mat-cell *matCellDef="let task">{{task.priority}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="dueDate">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha Límite</th>
+      <!-- <td mat-cell *matCellDef="let task">{{task.dueDate | date: 'dd/MM/yyyy - hh:mm:ss a'}}</td> -->
+      <td mat-cell *matCellDef="let task">{{task.dueDate}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="tags">
+      <th mat-header-cell *matHeaderCellDef>Etiquetas</th>
+      <td mat-cell *matCellDef="let task">
+        <mat-chip-set>
+          @for (tag of task.tags; track tag) {
+            <mat-chip>{{ tag }}</mat-chip>
+          }
+        </mat-chip-set>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>Acciones</th>
+      <td mat-cell *matCellDef="let task">
+        <button mat-icon-button color="primary" (click)="editTask(task)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="confirmDelete(task)">
+          <mat-icon>delete</mat-icon>
+        </button>
+        <button mat-icon-button (click)="viewHistory(task)">
+          <mat-icon>history</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+    <tr mat-row *matRowDef="let row; columns: columnsToDisplay;"></tr>
+  </table>
+
+  <mat-paginator [pageSize]="5"></mat-paginator>
+
+  <!-- Formulario modal o expandible debajo si decides integrarlo aquí -->
+</div>
