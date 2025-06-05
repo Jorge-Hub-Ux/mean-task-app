@@ -3,14 +3,12 @@ import { TasksService } from './tasks.service';
 import { Task, TaskPriority, TaskStatus } from '../../shared/models/task.model';
 import {
   FormBuilder,
-  FormGroup,
   Validators,
   FormArray,
   FormControl,
   ReactiveFormsModule,
-  FormsModule,
 } from '@angular/forms';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 
@@ -20,12 +18,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatSort } from '@angular/material/sort';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatChipsModule, MatChipInputEvent } from '@angular/material/chips';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { TaskHistoryComponent } from '../task-history/task-history.component';
 
@@ -39,15 +35,10 @@ import { TaskHistoryComponent } from '../task-history/task-history.component';
     MatSelectModule,
     MatOptionModule,
     MatTableModule,
-    MatSortModule,
     MatPaginatorModule,
     MatChipsModule,
-    MatIconModule,
-    MatButtonModule,
     MatCardModule,
-    MatDialogModule,
     ReactiveFormsModule,
-    FormsModule,
   ],
   templateUrl: './tasks.component.html',
   styleUrl: './tasks.component.scss',
