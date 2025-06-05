@@ -3,8 +3,9 @@
   "version": "1.0.1",
   "main": "backend/src/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node backend/src/server.js"
+    "start": "node backend/dist/server.js",
+    "build": "tsc -p backend/tsconfig.json",
+    "heroku-postbuild": "npm run build"
   },
   "repository": {
     "type": "git",
