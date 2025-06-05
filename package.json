@@ -18,7 +18,11 @@
     "mongodb": "^6.16.0",
     "mongoose": "^8.15.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "@types/express": "^5.0.2",
+    "@types/cors": "^2.8.18",
+    "@types/mongoose": "^5.11.96",
+    "@types/node": "^22.15.29"
   },
   "keywords": [],
   "author": "",
@@ -28,7 +32,7 @@
   },
   "homepage": "https://github.com/Jorge-Hub-Ux/mean-task-app#readme",
   "description": "",
-    "engines": {
+  "engines": {
     "node": "22.x"
   }
 }
