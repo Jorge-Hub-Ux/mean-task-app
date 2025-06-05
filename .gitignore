@@ -1,3 +1,6 @@
 .DS_Store
 README_STEPS.md
 resume_steps.txt
+
+/node_modules
+npm-debug.log*
