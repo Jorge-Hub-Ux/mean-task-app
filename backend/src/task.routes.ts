@@ -178,11 +178,17 @@ taskRouter.put("/:id", async (req, res, next): Promise<void> => {
 
     updates.updatedAt = new Date();
 
+    if (updates.dueDate) {
+      updates.dueDate = new Date(updates.dueDate);
+    }
+
     // Agregar entrada de historial
     const updateDoc: any = {
       $set: updates,
       $push: { history: historyEntry },
     };
+    
+    console.log("updateDoc: ", updateDoc);
 
     const result = await collections.tasks?.findOneAndUpdate(
       { _id: new ObjectId(id) },

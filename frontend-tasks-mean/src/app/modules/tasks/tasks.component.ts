@@ -7,8 +7,10 @@ import {
   Validators,
   FormArray,
   FormControl,
+  ReactiveFormsModule,
+  FormsModule,
 } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 
@@ -24,6 +26,8 @@ import { MatChipsModule, MatChipInputEvent } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule, DatePipe } from '@angular/common';
+import { MatCardModule } from '@angular/material/card';
+import { TaskHistoryComponent } from '../task-history/task-history.component';
 
 @Component({
   selector: 'app-tasks',
@@ -40,7 +44,10 @@ import { CommonModule, DatePipe } from '@angular/common';
     MatChipsModule,
     MatIconModule,
     MatButtonModule,
-    DatePipe,
+    MatCardModule,
+    MatDialogModule,
+    ReactiveFormsModule,
+    FormsModule,
   ],
   templateUrl: './tasks.component.html',
   styleUrl: './tasks.component.scss',
@@ -70,22 +77,23 @@ export class TasksComponent {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
+  dialog = inject(MatDialog);
 
   // Forms
-  form: FormGroup;
   isEditing = false;
   editingTaskId: string | null = null;
 
-  constructor(private tasksService: TasksService, private fb: FormBuilder) {
-    this.form = this.fb.group({
-      title: ['', [Validators.required, Validators.minLength(3)]],
-      description: [''],
-      status: ['Pending', Validators.required],
-      priority: ['Medium'],
-      dueDate: ['', Validators.required],
-      tags: this.fb.array([]),
-    });
-  }
+  constructor(private tasksService: TasksService) {}
+
+  #formBuilder = inject(FormBuilder);
+  form = this.#formBuilder.group({
+    title: ['', [Validators.required, Validators.minLength(3)]],
+    description: [''],
+    status: [TaskStatus.PENDING, [Validators.required]],
+    priority: [TaskPriority.MEDIUM],
+    dueDate: ['', [Validators.required]],
+    tags: this.#formBuilder.array([]),
+  });
 
   get tags(): FormArray {
     return this.form.get('tags') as FormArray;
@@ -104,7 +112,10 @@ export class TasksComponent {
   }
 
   startCreateTask() {
-    this.form.reset({ status: 'Pending', priority: 'Medium' });
+    this.form.reset({
+      status: TaskStatus.PENDING,
+      priority: TaskPriority.MEDIUM,
+    });
     this.tags.clear();
     this.isEditing = false;
     this.editingTaskId = null;
@@ -127,10 +138,16 @@ export class TasksComponent {
   submitForm() {
     if (this.form.invalid) return;
 
+    if (this.form.value.dueDate == null || this.form.value.dueDate == undefined)
+      return;
+
     const taskData: Task = {
-      ...this.form.value,
+      title: this.form.value.title ?? '',
+      description: this.form.value.description ?? '',
+      status: this.form.value.status ?? TaskStatus.PENDING,
+      priority: this.form.value.priority ?? TaskPriority.MEDIUM,
       tags: this.tags.value,
-      dueDate: new Date(this.form.value.dueDate),
+      dueDate: new Date(this.form.value.dueDate ?? new Date()),
     };
 
     if (this.isEditing && this.editingTaskId) {
@@ -232,11 +249,6 @@ export class TasksComponent {
     this.loadTasks(); // Esto aplicará todos los filtros juntos
   }
 
-  editTask(task: Task) {
-    console.log('Editar tarea', task);
-    // Lógica para mostrar formulario (expandible o modal)
-  }
-
   confirmDelete(task: Task) {
     if (confirm(`¿Deseas eliminar la tarea "${task.title}"?`)) {
       this.tasksService.deleteTask(task._id!).subscribe(() => {
@@ -246,99 +258,9 @@ export class TasksComponent {
   }
 
   viewHistory(task: Task) {
-    console.log('Ver historial', task);
-    // Mostrar historial si está disponible
+    this.dialog.open(TaskHistoryComponent, {
+      data: task,
+      width: '400px',
+    });
   }
-
-  // ngOnInit(): void {
-  // // GET ALL
-  // this.tasksService.getTasks().subscribe({
-  //   next: (tasks) => console.log('Tasks:', tasks),
-  //   error: (err) => console.error('Error:', err),
-  // });
-  // // GET ALL BY ID
-  // this.tasksService.getTaskById('683fce36fea133a5f80ba457').subscribe({
-  //   next: (task) => console.log('Task by ID:', task),
-  //   error: (err) => console.error('Error:', err),
-  // });
-  // // PUT TASK
-  // this.tasksService.updateTask('683fce36fea133a5f80ba457', { status: TaskStatus.IN_PROGESS }).subscribe({
-  //   next: (updated) => console.log('Updated:', updated),
-  //   error: (err) => console.error('Error:', err),
-  // });
-  // // DELETE TASK
-  // this.tasksService.deleteTask('ID_AQUI').subscribe({
-  //   next: () => console.log('Deleted successfully'),
-  //   error: (err) => console.error('Error:', err),
-  // });
-  // // POST TASK
-  // const task: Task = {
-  //   title: 'Implementar pruebas unitarias',
-  //   description: 'Agregar pruebas con Jasmine para el componente tasks',
-  //   status: TaskStatus.PENDING,
-  //   dueDate: new Date(Date.now() + 86400000),
-  //   priority: TaskPriority.HIGH,
-  //   tags: ['testing', 'angular'],
-  //   createdAt: new Date(),
-  //   updatedAt: new Date(),
-  // };
-  // this.tasksService.createTask(task).subscribe({
-  //   next: (res) => console.log('Created:', res),
-  //   error: (err) => console.error('Error:', err),
-  // });
-  // }
-
-  // getAllTasks(): void {
-  //   this.tasksService.getTasks().subscribe({
-  //     next: (tasks) => {
-  //       this.tasks = tasks;
-  //       console.log('Tasks:', tasks);
-  //     },
-  //     error: (err) => console.error('Error:', err),
-  //   });
-  // }
-
-  // getTaskById(): void {
-  //   const id = '683fce36fea133a5f80ba457';
-  //   this.tasksService.getTaskById(id).subscribe({
-  //     next: (task) => console.log('Task by ID:', task),
-  //     error: (err) => console.error('Error:', err),
-  //   });
-  // }
-
-  // updateTask(): void {
-  //   const id = '683fce36fea133a5f80ba457';
-  //   this.tasksService
-  //     .updateTask(id, { status: TaskStatus.IN_PROGESS })
-  //     .subscribe({
-  //       next: (updated) => console.log('Updated:', updated),
-  //       error: (err) => console.error('Error:', err),
-  //     });
-  // }
-
-  // deleteTask(): void {
-  //   const id = '683fd55e089cc982be057dce';
-  //   this.tasksService.deleteTask(id).subscribe({
-  //     next: (res) => console.log('Deleted successfully: ', res),
-  //     error: (err) => console.error('Error:', err),
-  //   });
-  // }
-
-  // createTask(): void {
-  //   const task: Task = {
-  //     title: 'Implementar pruebas unitarias',
-  //     description: 'Agregar pruebas con Jasmine para el componente tasks',
-  //     status: TaskStatus.PENDING,
-  //     dueDate: new Date(Date.now() + 86400000),
-  //     priority: TaskPriority.HIGH,
-  //     tags: ['testing', 'angular'],
-  //     createdAt: new Date(),
-  //     updatedAt: new Date(),
-  //   };
-
-  //   this.tasksService.createTask(task).subscribe({
-  //     next: (res) => console.log('Created:', res),
-  //     error: (err) => console.error('Error:', err),
-  //   });
-  // }
 }

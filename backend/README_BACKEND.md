@@ -43,7 +43,7 @@ This is the backend of the task management application developed as part of a ME
 4. Start the server:
 
    ```bash
-   npm start
+   npm run serve
    ```
 
    The server will run at: [http://localhost:5200]

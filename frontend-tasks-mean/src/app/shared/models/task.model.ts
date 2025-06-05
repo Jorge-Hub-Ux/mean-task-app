@@ -10,6 +10,11 @@ export enum TaskPriority {
   HIGH = 'High',
 }
 
+export interface TaskHistoryEntry {
+  changedAt: Date;
+  changes: string[];
+}
+
 export interface Task {
   _id?: any;
   title: string;
@@ -20,5 +25,6 @@ export interface Task {
   tags?: string[];
   createdAt?: Date;
   updatedAt?: Date;
+  history?: TaskHistoryEntry[];
 }
 

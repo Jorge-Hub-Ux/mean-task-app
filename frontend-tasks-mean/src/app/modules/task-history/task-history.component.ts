@@ -1,15 +1,22 @@
-import { Component, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, Inject, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatButtonModule } from '@angular/material/button';
 import { Task } from '../../shared/models/task.model';
 
 @Component({
   selector: 'app-task-history',
+  standalone: true,
+  imports: [
+    CommonModule,
+    MatDialogModule,
+    MatDividerModule,
+    MatButtonModule,
+  ],
   templateUrl: './task-history.component.html',
-  styleUrls: ['./task-history.component.css']
+  styleUrls: ['./task-history.component.scss']
 })
 export class TaskHistoryComponent {
-
-  constructor(@Inject(MAT_DIALOG_DATA) public task: Task) {}
-
-
+  @Input() task!: Task;
 }
