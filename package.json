@@ -1,14 +1,12 @@
 {
   "name": "mean-task-app",
   "version": "1.0.0",
-  "main": "dist/server.js",
+  "main": "src/server.js",
   "scripts": {
-    "heroku-postbuild": "cd frontend-tasks-mean && npm install && npm run build && cd .. && npm run build",
-    "build": "tsc", 
-    "start": "node dist/server.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "engines": {
-    "node": "20.x"
+    "node": "22.x"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -17,14 +15,7 @@
     "mongodb": "^6.16.0",
     "mongoose": "^8.15.1"
   },
-  "devDependencies": {
-    "@types/cors": "^2.8.18",
-    "@types/express": "^5.0.2",
-    "@types/mongoose": "^5.11.96",
-    "@types/node": "^22.15.29",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
-  },
+
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Jorge-Hub-Ux/mean-task-app.git"
