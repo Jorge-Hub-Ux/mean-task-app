@@ -19,6 +19,8 @@ if (!ATLAS_URI) {
   process.exit(1);
 }
 
+const port = process.env.PORT || 5200;
+
 // Connect to MongoDB and start the server once connected
 connectToDatabase(ATLAS_URI)
   .then(() => {
@@ -30,7 +32,7 @@ connectToDatabase(ATLAS_URI)
     app.use(errorHandler);
 
     // start the Express server
-    app.listen(5200, () => {
+    app.listen(port, () => {
       console.log(`Server running at http://localhost:5200...`);
     });
   })
