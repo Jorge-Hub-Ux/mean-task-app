@@ -1,0 +1,25 @@
+<h2 mat-dialog-title>Historial de cambios</h2>
+
+@if (task && task.history && task.history.length > 0) {
+  <mat-dialog-content>
+    @for (entry of task.history; track entry) {
+      <div class="mb-4">
+        <p class="font-bold text-sm">{{ entry.changedAt | date: 'short' }}</p>
+        <ul class="pl-4 list-disc">
+          @for (change of entry.changes; track change) {
+            <li>{{ change }}</li>
+          }
+        </ul>
+        <mat-divider></mat-divider>
+      </div>
+    }
+  </mat-dialog-content>
+} @else {
+  <mat-dialog-content>
+    <p>Esta tarea no tiene historial registrado.</p>
+  </mat-dialog-content>
+}
+
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close>Cerrar</button>
+</mat-dialog-actions>

@@ -1,6 +1,3 @@
-import * as mongodb from 'mongodb';
-
-// This file defines the Task interface and related enums for task management in a project.
 export enum TaskStatus {
   PENDING = 'Pending',
   IN_PROGESS = 'In Progress',
@@ -19,7 +16,7 @@ export interface TaskHistoryEntry {
 }
 
 export interface Task {
-  _id?: mongodb.ObjectId;
+  _id?: any;
   title: string;
   description?: string;
   status: TaskStatus;
@@ -30,3 +27,4 @@ export interface Task {
   updatedAt?: Date;
   history?: TaskHistoryEntry[];
 }
+
