@@ -42,6 +42,7 @@
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
+              "outputHashing": "all",
               "budgets": [
                 {
                   "type": "initial",
@@ -53,13 +54,22 @@
                   "maximumWarning": "4kB",
                   "maximumError": "8kB"
                 }
-              ],
-              "outputHashing": "all"
+              ]
             },
             "development": {
+              "buildOptimizer": false,
               "optimization": false,
+              "sourceMap": true,
               "extractLicenses": false,
-              "sourceMap": true
+              "namedChunks": true,
+              "aot": false,
+              "vendorChunk": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.local.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -71,11 +81,9 @@
               "buildTarget": "frontend-tasks-mean:build:production"
             },
             "development": {
-              "buildTarget": "frontend-tasks-mean:build:development"
+              "buildTarget": "frontend-tasks-mean:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
-          },
-          "options": {
-            "proxyConfig": "proxy.conf.json"
           },
           "defaultConfiguration": "development"
         },
