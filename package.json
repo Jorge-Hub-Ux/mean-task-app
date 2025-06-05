@@ -27,5 +27,8 @@
     "url": "https://github.com/Jorge-Hub-Ux/mean-task-app/issues"
   },
   "homepage": "https://github.com/Jorge-Hub-Ux/mean-task-app#readme",
-  "description": ""
+  "description": "",
+    "engines": {
+    "node": "22.x"
+  }
 }
